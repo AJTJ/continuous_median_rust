@@ -53,10 +53,7 @@ fn main() {
     // for lower nums
     let mut lowers = BinaryHeap::new();
     // all values
-    let vals = vec![1.0, 5.0, 3.0, 6.0, 1.0, 7.0, 3.0];
-
-    highers.push(MinFloat(1.0));
-    lowers.push(Reverse(MinFloat(1.0)));
+    let vals = vec![1.0, 5.0, 6.1, 1.2, 7.0, 11.2];
 
     for val in vals {
         add_number(val, &mut lowers, &mut highers);
@@ -80,11 +77,11 @@ fn add_number(
 }
 
 fn rebalance(lowers: &mut BinaryHeap<Reverse<MinFloat>>, highers: &mut BinaryHeap<MinFloat>) {
-    if lowers.len() - highers.len() >= 2 {
+    if lowers.len().checked_sub(highers.len()) >= Some(2) {
         let Reverse(val) = lowers.pop().unwrap();
         highers.push(val);
     }
-    if highers.len() - lowers.len() >= 2 {
+    if highers.len().checked_sub(lowers.len()) >= Some(2) {
         let val = highers.pop().unwrap();
         lowers.push(Reverse(val));
     }
@@ -95,9 +92,12 @@ fn get_median(
     highers: &mut BinaryHeap<MinFloat>,
 ) -> f64 {
     if (lowers.len() + highers.len()) % 2 == 0 {
+        println!("low: {:?}, high: {:?}", lowers, highers);
+        println!("len {}, {}", lowers.len(), highers.len());
         let Reverse(MinFloat(low_val)) = lowers.pop().unwrap();
         let MinFloat(high_val) = highers.pop().unwrap();
-        return low_val + high_val;
+        println!("{}, {}", low_val, high_val);
+        return (low_val + high_val) / 2.0;
     } else if lowers.len() > highers.len() {
         let Reverse(MinFloat(low_val)) = lowers.pop().unwrap();
         return low_val;
